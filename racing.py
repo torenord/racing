@@ -328,8 +328,19 @@ while True:
         print(P)
     elif inp == "e":
         print(P.evaluate())
-    elif inp == "c":
-        score, m = P.negamax(2)
+    elif inp.split(" ")[0] == "c":
+        try:
+            depth = int(inp.split(" ")[1])
+        except:
+            depth = 2
+        score, m = P.negamax(depth)
+        print(m)
+    elif inp.split(" ")[0] == "c!":
+        try:
+            depth = int(inp.split(" ")[1])
+        except:
+            depth = 2
+        score, m = P.negamax(depth)
         P = m
         P.whitesTurn = not P.whitesTurn
         print(P)
