@@ -1,4 +1,4 @@
-# Sigurd joina
+from math import inf
 
 class bcolors:
     HEADER = '\033[95m'
@@ -292,10 +292,25 @@ class Position:
 
         return MAX, m
 
+    def negatest(self, depth):
+        if depth == 0:
+            return self.evaluate()
+
+        MAX = -1000
+
+        for p in self.reallylegal():
+            p.whitesTurn = not p.whitesTurn
+            score = -p.negatest(depth-1)
+
+            if score > MAX:
+                MAX = score
+
+        return MAX
+
     def __lt__(self, other):
         return self.evaluate() < other.evaluate()
 
-P = Position(Board.parse(open("initial.txt").read()), True)
+P = Position(Board.parse(open("test.txt").read()), True)
 
 def decode(s):
     x = ord(s[0]) - ord("a")
@@ -317,7 +332,7 @@ while True:
         print(P)
     elif inp.split(" ")[0] == "l":
         filename = inp.split(" ")[1]
-        P = Position(Board.parse(open(filename).read()))
+        P = Position(Board.parse(open(filename).read()), True)
     elif inp.split(" ")[0] == "m":
         a = inp.split(" ")[1]
         b = inp.split(" ")[2]
@@ -337,12 +352,22 @@ while True:
             depth = 2
         score, m = P.negamax(depth)
         print(m)
-    elif inp.split(" ")[0] == "c!":
+    elif inp.split(" ")[0] == "a":
         try:
             depth = int(inp.split(" ")[1])
         except:
             depth = 2
-        score, m = P.negamax(depth)
-        P = m
-        P.whitesTurn = not P.whitesTurn
-        print(P)
+        maxscore = -inf
+        best = None
+        for p in P.reallylegal():
+            score = p.negatest(depth)
+            if score > maxscore:
+                maxscore = score
+                best = p
+        if best:
+            P = best
+            P.whitesTurn = not P.whitesTurn
+            print(P)
+    elif inp.split(" ")[0] == "next":
+        for p in P.reallylegal():
+            print(p)
