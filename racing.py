@@ -92,7 +92,12 @@ class Position:
         return piece.lower() if piece.isupper() else piece.upper()
 
     def hasking(self):
-        return any(row.count(self.flipcolor(self.kingsymbol())) > 0 for row in self.board.board)
+        kings = 0
+        for i in range(8):
+            for j in range(8):
+                if self.board.board[i][j] in "kK":
+                    kings += 1
+        return kings == 2
 
     def opponentskingincheck(self):
         return any(not p.board.hasking() for p in self.legalmoves())
@@ -244,9 +249,16 @@ class Position:
         moves += self.legalrookmoves()
         moves += self.legalqueenmoves()
 
+        for m in moves:
+            m.whitesTurn = not m.whitesTurn
+
         return moves
 
     def reallylegal(self):
+        for j in range(8):
+            if self.board.board[0][j] in "kK":
+                return []
+
         ret = []
         for p in self.legalmoves():
             good = True
@@ -264,53 +276,63 @@ class Position:
         for i in range(8):
             for j in range(8):
                 if self.board.board[i][j] == "K":
-                    score += 8-i
+                    if i == 0:
+                        score = inf
+                    else:
+                        score += 8-i
                 if self.board.board[i][j] == "k":
-                    score -= 8-i
+                    if i == 0:
+                        score = -inf
+                    else:
+                        score -= 8-i
 
         return score if self.whitesTurn else -score
 
     def negamax(self, depth):
         if depth == 0:
-            return self.evaluate(), self
-
-        MAX = -1000
-
-        moves = self.reallylegal()
-        if len(moves) == 0:
-            return -1000, self
-
-        m = moves[0]
-
-        for p in moves:
-            score, _ = p.negamax(depth-1)
-            score = -score
-
-            if score > MAX:
-                m = p
-                MAX = score
-
-        return MAX, m
-
-    def negatest(self, depth):
-        if depth == 0:
             return self.evaluate()
 
-        MAX = -1000
+        MAX = -inf
 
         for p in self.reallylegal():
-            p.whitesTurn = not p.whitesTurn
-            score = -p.negatest(depth-1)
+            score = -p.negamax(depth-1)
 
             if score > MAX:
                 MAX = score
 
         return MAX
 
+    def negamaxab(self, depth, a, b):
+        if depth == 0:
+            return self.evaluate()
+
+        MAX = -inf
+
+        moves = self.reallylegal()
+        moves = sorted(moves, reverse=True)
+
+        for p in moves:
+            score = -p.negamaxab(depth-1, -b, -a)
+
+            MAX = max(MAX, score)
+            a = max(a, score)
+
+            if a >= b:
+                break
+
+        return MAX
+
     def __lt__(self, other):
         return self.evaluate() < other.evaluate()
 
-P = Position(Board.parse(open("test.txt").read()), True)
+import sys
+
+if len(sys.argv) == 2:
+    filename = sys.argv[1]
+else:
+    filename = "test.txt"
+
+P = Position(Board.parse(open(filename).read()), True)
 
 def decode(s):
     x = ord(s[0]) - ord("a")
@@ -319,6 +341,8 @@ def decode(s):
     return x, y
 
 import readline
+
+defaultdepth = 1
 
 while True:
     try:
@@ -343,31 +367,49 @@ while True:
         P.board.movepiece(x1, y1, x2, y2)
         P.whitesTurn = not P.whitesTurn
         print(P)
-    elif inp == "e":
-        print(P.evaluate())
+    elif inp.split(" ")[0] == "e":
+        try:
+            depth = int(inp.split(" ")[1])
+        except:
+            depth = defaultdepth
+        print(-P.negamax(depth))
     elif inp.split(" ")[0] == "c":
         try:
             depth = int(inp.split(" ")[1])
         except:
-            depth = 2
-        score, m = P.negamax(depth)
-        print(m)
-    elif inp.split(" ")[0] == "a":
-        try:
-            depth = int(inp.split(" ")[1])
-        except:
-            depth = 2
+            depth = defaultdepth
         maxscore = -inf
         best = None
         for p in P.reallylegal():
-            score = p.negatest(depth)
-            if score > maxscore:
+            score = -p.negamax(depth)
+            if score >= maxscore:
                 maxscore = score
                 best = p
         if best:
             P = best
-            P.whitesTurn = not P.whitesTurn
             print(P)
-    elif inp.split(" ")[0] == "next":
+    elif inp.split(" ")[0] == "a":
+        try:
+            depth = int(inp.split(" ")[1])
+        except:
+            depth = defaultdepth
+        maxscore = -inf
+        best = None
+        for p in P.reallylegal():
+            score = -p.negamaxab(depth, -inf, inf)
+            if score >= maxscore:
+                maxscore = score
+                best = p
+        if best:
+            P = best
+            print(P)
+    elif inp.split(" ")[0] == "n":
+        try:
+            depth = int(inp.split(" ")[1])
+        except:
+            depth = defaultdepth
         for p in P.reallylegal():
             print(p)
+            print(-p.negamax(depth))
+    elif inp.split(" ")[0] == "x":
+        print(P.negamax(int(inp.split(" ")[1])))
