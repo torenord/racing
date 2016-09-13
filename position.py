@@ -1,11 +1,27 @@
 class Position:
-    def parse(s):
-        p = Position()
+    def __init__(self):
+        initial = """
+   +---+---+---+---+---+---+---+---+
+ 8 |   |   |   |   |   |   |   |   |
+   +---+---+---+---+---+---+---+---+
+ 7 |   |   |   |   |   |   |   |   |
+   +---+---+---+---+---+---+---+---+
+ 6 |   |   |   |   |   |   |   |   |
+   +---+---+---+---+---+---+---+---+
+ 5 |   |   |   |   |   |   |   |   |
+   +---+---+---+---+---+---+---+---+
+ 4 |   |   |   |   |   |   |   |   |
+   +---+---+---+---+---+---+---+---+
+ 3 |   |   |   |   |   |   |   |   |
+   +---+---+---+---+---+---+---+---+
+ 2 | k | r | b | n | N | B | R | K |
+   +---+---+---+---+---+---+---+---+
+ 1 | q | r | b | n | N | B | R | Q |
+   +---+---+---+---+---+---+---+---+
+     a   b   c   d   e   f   g   h   █
+"""
 
-        p.board = [row.strip()[4:-2].split(" | ") for row in s.strip().split("\n")[1:17:2]]
-        p.whitesTurn = s.strip().split("\n")[-1][1] == " "
-
-        return p
+        self.parse(initial)
 
     def __str__(self):
         colorsenabled = True
@@ -35,9 +51,15 @@ class Position:
 
         return s
 
+    def parse(self, s):
+        self.board = [row.strip()[4:-2].split(" | ") for row in s.strip().split("\n")[1:17:2]]
+        self.whitesTurn = s.strip().split("\n")[-1][1] == " "
+
+        return self
+
 if __name__ == '__main__':
     from sys import stdin
 
     if not stdin.isatty():
-        p = Position.parse(stdin.read())
+        p = Position().parse(stdin.read())
         print(p)
