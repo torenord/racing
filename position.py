@@ -23,9 +23,27 @@ class Position:
 
         self.parse(initial)
 
-    def __str__(self):
-        colorsenabled = True
+    def __repr__(self):
         turnmarker = "\u2588"
+
+        s = "   +---+---+---+---+---+---+---+---+\n"
+
+        for i in range(8):
+            rank = 8-i
+            s += " %s | " % rank + " | ".join(self.board[i]) + " |\n"
+            s += "   +---+---+---+---+---+---+---+---+\n"
+
+        s += " "
+        s += turnmarker if not self.whitesTurn else " "
+        s += "   a   b   c   d   e   f   g   h   "
+        s += turnmarker if self.whitesTurn else ""
+
+        return s
+
+    def __str__(self):
+        s = repr(self)
+
+        colorsenabled = True
 
         def makered(s):
             if colorsenabled:
@@ -33,21 +51,9 @@ class Position:
             else:
                 return s
 
-        s = "   +---+---+---+---+---+---+---+---+\n"
-
-        for i in range(8):
-            rank = 8-i
-            s += " %s | " % rank + " | ".join(self.board[i]) + " |\n"
-
+        if colorsenabled:
             for blackpiece in "kqrbn":
                 s = s.replace(blackpiece, makered(blackpiece))
-
-            s += "   +---+---+---+---+---+---+---+---+\n"
-
-        s += " "
-        s += makered(turnmarker) if not self.whitesTurn else " "
-        s += "   a   b   c   d   e   f   g   h   "
-        s += turnmarker if self.whitesTurn else ""
 
         return s
 
