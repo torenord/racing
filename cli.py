@@ -11,16 +11,19 @@ while True:
         print()
         break
 
+    # Quit
     if inp == "q":
         break
 
+    # Help
     if inp == "h":
         print("q -- Quit")
         print("h -- Help")
         print("p -- Print current position")
         print("l -- Load position from file")
         print("s -- Save position from file")
-        print("h -- Print legal next positions")
+        print("n -- Print legal next positions")
+        print("c -- Compute and apply next positions")
 
     # Print current position
     elif inp == "p":
@@ -32,7 +35,7 @@ while True:
             filename = inp.split(" ")[1]
             position = Position().parse(open(filename).read())
             print(position)
-        except:
+        except IndexError:
             pass
 
     # Save position from file
@@ -41,7 +44,7 @@ while True:
             filename = inp.split(" ")[1]
             with open(filename, "w") as f:
                 f.write(repr(position))
-        except:
+        except IndexError:
             pass
 
     # Print legal next positions
