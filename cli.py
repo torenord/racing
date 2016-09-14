@@ -1,4 +1,5 @@
 from position import Position
+from search import negamaxpos
 import readline
 import sys
 
@@ -48,6 +49,17 @@ def handle(inp):
     elif inp == "n":
         for p in position.legalmoves():
             print(p)
+
+    # Compute and apply next positions
+    elif inp.split(" ")[0] == "c":
+        try:
+            depth = int(inp.split(" ")[1])
+            p = negamaxpos(position, depth, -1000, 1000)
+            print(p)
+            position = p
+        except (IndexError, ValueError):
+            pass
+
 if len(sys.argv) == 2:
     handle(sys.argv[1])
 else:
