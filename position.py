@@ -52,8 +52,14 @@ class Position:
                 return s
 
         if colorsenabled:
-            for blackpiece in "kqrbn":
-                s = s.replace(blackpiece, makered(blackpiece))
+            lst = []
+            for i in range(len(s.split("\n"))):
+                line = s.split("\n")[i]
+                if i < 2*8:
+                    for blackpiece in "kqrbn":
+                        line = line.replace(blackpiece, makered(blackpiece))
+                lst.append(line)
+            s = "\n".join(lst)
 
         return s
 
