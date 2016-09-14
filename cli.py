@@ -2,6 +2,7 @@ from position import Position
 from search import negamaxpos
 import readline
 import sys
+import time
 
 # Initial game position
 position = Position().setup()
@@ -53,10 +54,13 @@ def handle(cmd):
     # Compute and apply next positions
     elif cmd.split(" ")[0] == "c":
         try:
+            start = time.time()
             depth = int(cmd.split(" ")[1])
             p = negamaxpos(position, depth, -1000, 1000)
             print(p)
             position = p
+            end = time.time()
+            print("Completed in {0:.3} seconds.".format(end - start))
         except (IndexError, ValueError):
             pass
 
