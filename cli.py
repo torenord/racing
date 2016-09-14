@@ -4,7 +4,7 @@ import readline
 import sys
 
 # Initial game position
-position = Position()
+position = Position().setup()
 
 def handle(cmd):
     global position

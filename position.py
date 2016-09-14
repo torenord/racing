@@ -1,7 +1,7 @@
 inf = 1000
 
 class Position:
-    def __init__(self):
+    def setup(self):
         initial = """
    +---+---+---+---+---+---+---+---+
  8 |   |   |   |   |   |   |   |   |
@@ -24,6 +24,7 @@ class Position:
 """
 
         self.parse(initial)
+        return self
 
     def __repr__(self):
         turnmarker = "\u2588"
@@ -96,7 +97,11 @@ class Position:
         return "Q" if self.whitesTurn else "q"
 
     def clone(self):
-        p = Position().parse(repr(self))
+        p = Position()
+        p.board = []
+        for row in self.board:
+            p.board.append(row[:])
+        p.whitesTurn = self.whitesTurn
         return p
 
     def movepiece(self, x1, y1, x2, y2):
