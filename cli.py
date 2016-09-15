@@ -7,6 +7,12 @@ import time
 # Initial game position
 position = Position().setup()
 
+def decode(s):
+    x = ord(s[0]) - ord("a")
+    y = 8 - int(s[1])
+
+    return x, y
+
 def handle(cmd):
     global position
 
@@ -23,6 +29,7 @@ def handle(cmd):
         print("s -- Save position from file")
         print("n -- Print legal next positions")
         print("c -- Compute and apply next positions")
+        print("m -- Move a piece")
 
     # Print current position
     elif cmd == "p":
@@ -50,6 +57,18 @@ def handle(cmd):
     elif cmd == "n":
         for p in position.legalmoves():
             print(p)
+
+    # Move a piece
+    elif cmd.split(" ")[0] == "m":
+        a = cmd.split(" ")[1]
+        b = cmd.split(" ")[2]
+
+        y1, x1 = decode(a)
+        y2, x2 = decode(b)
+
+        position.movepiece(x1, y1, x2, y2)
+        position.whitesTurn = not position.whitesTurn
+        print(position)
 
     # Compute and apply next positions
     elif cmd.split(" ")[0] == "c":
