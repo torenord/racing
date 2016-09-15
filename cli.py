@@ -91,7 +91,7 @@ def handle(cmd):
         print(position)
 
     # Show last principles variation
-    elif cmd.split(" ")[0] == "y":
+    elif cmd.split(" ")[0] == "v":
         for p in line:
             print(p)
 
