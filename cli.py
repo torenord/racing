@@ -1,11 +1,14 @@
 from position import Position
-from search import negamaxpos
+from search import negamax
 import readline
 import sys
 import time
 
 # Initial game position
 position = Position().setup()
+
+# Principle variation
+line = []
 
 def decode(s):
     x = ord(s[0]) - ord("a")
@@ -30,6 +33,7 @@ def handle(cmd):
         print("n -- Print legal next positions")
         print("c -- Compute and apply next positions")
         print("m -- Move a piece")
+        print("v -- Show last principles variation")
 
     # Print current position
     elif cmd == "p":
@@ -58,6 +62,22 @@ def handle(cmd):
         for p in position.legalmoves():
             print(p)
 
+    # Compute and apply next positions
+    elif cmd.split(" ")[0] == "c":
+        try:
+            start = time.time()
+            depth = int(cmd.split(" ")[1])
+            global line
+            score, line = negamax(position, depth, -1000, 1000)
+            position = line[0]
+            score *= -1 if position.whitesTurn else 1
+            print(position)
+            print("Evaluation: ", score)
+            end = time.time()
+            print("Completed in {0:.3} seconds.".format(end - start))
+        except (IndexError, ValueError):
+            pass
+
     # Move a piece
     elif cmd.split(" ")[0] == "m":
         a = cmd.split(" ")[1]
@@ -70,18 +90,10 @@ def handle(cmd):
         position.whitesTurn = not position.whitesTurn
         print(position)
 
-    # Compute and apply next positions
-    elif cmd.split(" ")[0] == "c":
-        try:
-            start = time.time()
-            depth = int(cmd.split(" ")[1])
-            p = negamaxpos(position, depth, -1000, 1000)
+    # Show last principles variation
+    elif cmd.split(" ")[0] == "y":
+        for p in line:
             print(p)
-            position = p
-            end = time.time()
-            print("Completed in {0:.3} seconds.".format(end - start))
-        except (IndexError, ValueError):
-            pass
 
 if len(sys.argv) == 2:
     handle(sys.argv[1])
