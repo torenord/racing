@@ -108,24 +108,13 @@ class Position:
         self.board[x2][y2] = self.board[x1][y1]
         self.board[x1][y1] = " "
 
-    def kingmoves(self):
+    def closepiecemoves(self, symbol, moves):
         ret = []
 
         for i in range(8):
             for j in range(8):
-                if self.board[i][j] == self.kingsymbol():
-                    kingmoves = [
-                        (1,   1),
-                        (1,   0),
-                        (1,  -1),
-                        (0,   1),
-                        (0,  -1),
-                        (-1,  1),
-                        (-1,  0),
-                        (-1, -1),
-                    ]
-
-                    for di, dy in kingmoves:
+                if self.board[i][j] == symbol:
+                    for di, dy in moves:
                         if self.validcell(i+di, j+dy):
                             if self.emptycell(i+di, j+dy) or self.opponentspiece(self.board[i+di][j+dy]):
                                 p = self.clone()
@@ -134,104 +123,12 @@ class Position:
 
         return ret
 
-    def knightmoves(self):
+    def rangedpiecemoves(self, symbol, directions):
         ret = []
 
         for i in range(8):
             for j in range(8):
-                if self.board[i][j] == self.knightsymbol():
-                    knightmoves = [
-                        (2,  -1),
-                        (2,   1),
-                        (1,  -2),
-                        (1,   2),
-                        (-1, -2),
-                        (-1,  2),
-                        (-2, -1),
-                        (-2,  1),
-                    ]
-
-                    for di, dy in knightmoves:
-                        if self.validcell(i+di, j+dy):
-                            if self.emptycell(i+di, j+dy) or self.opponentspiece(self.board[i+di][j+dy]):
-                                p = self.clone()
-                                p.movepiece(i, j, i+di, j+dy)
-                                ret.append(p)
-
-        return ret
-
-    def bishopmoves(self):
-        ret = []
-
-        for i in range(8):
-            for j in range(8):
-                if self.board[i][j] == self.bishopsymbol():
-                    directions = [
-                        (1,   1),
-                        (1,  -1),
-                        (-1,  1),
-                        (-1, -1),
-                    ]
-                    for di, dy in directions:
-                        for k in range(1, 8):
-                            if self.validcell(i+(k*di), j+(k*dy)):
-                                if self.emptycell(i+(k*di), j+(k*dy)):
-                                    p = self.clone()
-                                    p.movepiece(i, j, i+(k*di), j+(k*dy))
-                                    ret.append(p)
-                                    continue
-                                if self.opponentspiece(self.board[i+(k*di)][j+(k*dy)]):
-                                    p = self.clone()
-                                    p.movepiece(i, j, i+(k*di), j+(k*dy))
-                                    ret.append(p)
-                                break
-
-        return ret
-
-    def rookmoves(self):
-        ret = []
-
-        for i in range(8):
-            for j in range(8):
-                if self.board[i][j] == self.rooksymbol():
-                    directions = [
-                        (1,  0),
-                        (-1, 0),
-                        (0,  1),
-                        (0, -1),
-                    ]
-                    for di, dy in directions:
-                        for k in range(1, 8):
-                            if self.validcell(i+(k*di), j+(k*dy)):
-                                if self.emptycell(i+(k*di), j+(k*dy)):
-                                    p = self.clone()
-                                    p.movepiece(i, j, i+(k*di), j+(k*dy))
-                                    ret.append(p)
-                                    continue
-                                if self.opponentspiece(self.board[i+(k*di)][j+(k*dy)]):
-                                    p = self.clone()
-                                    p.movepiece(i, j, i+(k*di), j+(k*dy))
-                                    ret.append(p)
-                                break
-
-        return ret
-
-    def queenmoves(self):
-        ret = []
-
-        for i in range(8):
-            for j in range(8):
-                if self.board[i][j] == self.queensymbol():
-                    directions = [
-                        (1,   1),
-                        (1,   0),
-                        (1,  -1),
-                        (0,   1),
-                        (0,  -1),
-                        (-1,  1),
-                        (-1,  0),
-                        (-1, -1),
-                    ]
+                if self.board[i][j] == symbol:
                     for di, dy in directions:
                         for k in range(1, 8):
                             if self.validcell(i+(k*di), j+(k*dy)):
@@ -251,11 +148,57 @@ class Position:
     def pseudolegalmoves(self):
         moves = []
 
-        moves += self.kingmoves()
-        moves += self.knightmoves()
-        moves += self.bishopmoves()
-        moves += self.rookmoves()
-        moves += self.queenmoves()
+        kingmoves = [
+            (1,   1),
+            (1,   0),
+            (1,  -1),
+            (0,   1),
+            (0,  -1),
+            (-1,  1),
+            (-1,  0),
+            (-1, -1),
+        ]
+        moves += self.closepiecemoves(self.kingsymbol(), kingmoves)
+
+        knightmoves = [
+            (2,  -1),
+            (2,   1),
+            (1,  -2),
+            (1,   2),
+            (-1, -2),
+            (-1,  2),
+            (-2, -1),
+            (-2,  1),
+        ]
+        moves += self.closepiecemoves(self.knightsymbol(), knightmoves)
+
+        bishopdirections = [
+            (1,   1),
+            (1,  -1),
+            (-1,  1),
+            (-1, -1),
+        ]
+        moves += self.rangedpiecemoves(self.bishopsymbol(), bishopdirections)
+
+        rookdirections = [
+            (1,  0),
+            (-1, 0),
+            (0,  1),
+            (0, -1),
+        ]
+        moves += self.rangedpiecemoves(self.rooksymbol(), rookdirections)
+
+        queendirections = [
+            (1,   1),
+            (1,   0),
+            (1,  -1),
+            (0,   1),
+            (0,  -1),
+            (-1,  1),
+            (-1,  0),
+            (-1, -1),
+        ]
+        moves += self.rangedpiecemoves(self.queensymbol(), queendirections)
 
         for m in moves:
             m.whitesTurn = not m.whitesTurn
