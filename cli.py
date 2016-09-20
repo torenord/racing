@@ -4,6 +4,8 @@ import readline
 import sys
 import time
 
+inf = 1000
+
 # Initial game position
 position = Position().setup()
 
@@ -68,7 +70,7 @@ def handle(cmd):
             start = time.time()
             depth = int(cmd.split(" ")[1])
             global line
-            score, line = negamax(position, depth, -1000, 1000)
+            score, line = negamax(position, depth, -inf, inf)
             position = line[0]
             score *= -1 if position.whitesTurn else 1
             print(position)
