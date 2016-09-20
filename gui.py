@@ -54,7 +54,7 @@ def on_draw():
     window.clear()
     for i in range(8):
         for j in range(8):
-            color = (255, 255, 255, 255) if (i+j) % 2 == 0 else (128, 128, 128, 255)
+            color = (255, 255, 255, 255) if (i+j) % 2 == 1 else (192, 224, 255, 255)
             draw_rect(square_size*i, square_size*j, square_size, square_size, color)
     for piece in render_pieces():
         piece.draw()
