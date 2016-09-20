@@ -148,7 +148,8 @@ class Position:
     def pseudolegalmoves(self):
         moves = []
 
-        kingmoves = [
+        # King moves
+        moves += self.closepiecemoves(self.kingsymbol(), [
             (1,   1),
             (1,   0),
             (1,  -1),
@@ -157,10 +158,10 @@ class Position:
             (-1,  1),
             (-1,  0),
             (-1, -1),
-        ]
-        moves += self.closepiecemoves(self.kingsymbol(), kingmoves)
+        ])
 
-        knightmoves = [
+        # Knight moves
+        moves += self.closepiecemoves(self.knightsymbol(), [
             (2,  -1),
             (2,   1),
             (1,  -2),
@@ -169,26 +170,26 @@ class Position:
             (-1,  2),
             (-2, -1),
             (-2,  1),
-        ]
-        moves += self.closepiecemoves(self.knightsymbol(), knightmoves)
+        ])
 
-        bishopdirections = [
+        # Bishop moves
+        moves += self.rangedpiecemoves(self.bishopsymbol(), [
             (1,   1),
             (1,  -1),
             (-1,  1),
             (-1, -1),
-        ]
-        moves += self.rangedpiecemoves(self.bishopsymbol(), bishopdirections)
+        ])
 
-        rookdirections = [
+        # Rook moves
+        moves += self.rangedpiecemoves(self.rooksymbol(), [
             (1,  0),
             (-1, 0),
             (0,  1),
             (0, -1),
-        ]
-        moves += self.rangedpiecemoves(self.rooksymbol(), rookdirections)
+        ])
 
-        queendirections = [
+        # Queen moves
+        moves += self.rangedpiecemoves(self.queensymbol(), [
             (1,   1),
             (1,   0),
             (1,  -1),
@@ -197,8 +198,7 @@ class Position:
             (-1,  1),
             (-1,  0),
             (-1, -1),
-        ]
-        moves += self.rangedpiecemoves(self.queensymbol(), queendirections)
+        ])
 
         for m in moves:
             m.whitesTurn = not m.whitesTurn
