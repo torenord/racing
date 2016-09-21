@@ -97,14 +97,26 @@ def handle(cmd):
         for p in line:
             print(p)
 
-if len(sys.argv) == 2:
-    handle(sys.argv[1])
-else:
-    while True:
-        try:
-            cmd = input("> ")
-        except (EOFError, KeyboardInterrupt):
-            print()
-            break
+def do(gui_position):
+    if len(sys.argv) == 2:
+        handle(sys.argv[1])
+    else:
+        while True:
+            try:
+                cmd = input("> ")
+            except (EOFError, KeyboardInterrupt):
+                print()
+                break
 
-        handle(cmd)
+            for i in range(8):
+                for j in range(8):
+                    position.board[i][j] = gui_position.board[i][j]
+                    position.whitesTurn = gui_position.whitesTurn
+            handle(cmd)
+            for i in range(8):
+                for j in range(8):
+                    gui_position.board[i][j] = position.board[i][j]
+                    gui_position.whitesTurn = position.whitesTurn
+
+if __name__ == '__main__':
+    do(Position().setup())
