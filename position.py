@@ -26,6 +26,9 @@ class Position:
         self.parse(initial)
         return self
 
+    whitePieces = "KQRBN"
+    blackPieces = "kqrbn"
+
     def __repr__(self):
         turnmarker = "\u2588"
 
@@ -81,21 +84,6 @@ class Position:
     def opponentspiece(self, p):
         return p.islower() == self.whitesTurn
 
-    def kingsymbol(self):
-        return "K" if self.whitesTurn else "k"
-
-    def knightsymbol(self):
-        return "N" if self.whitesTurn else "n"
-
-    def bishopsymbol(self):
-        return "B" if self.whitesTurn else "b"
-
-    def rooksymbol(self):
-        return "R" if self.whitesTurn else "r"
-
-    def queensymbol(self):
-        return "Q" if self.whitesTurn else "q"
-
     def clone(self):
         p = Position()
         p.board = []
@@ -145,60 +133,70 @@ class Position:
 
         return ret
 
+    kingmoves = (
+        (1,   1),
+        (1,   0),
+        (1,  -1),
+        (0,   1),
+        (0,  -1),
+        (-1,  1),
+        (-1,  0),
+        (-1, -1),
+    )
+
+    knightmoves = (
+        (2,  -1),
+        (2,   1),
+        (1,  -2),
+        (1,   2),
+        (-1, -2),
+        (-1,  2),
+        (-2, -1),
+        (-2,  1),
+    )
+
+    bishopmoves = (
+        (1,   1),
+        (1,  -1),
+        (-1,  1),
+        (-1, -1),
+    )
+
+    rookmoves = (
+        (1,  0),
+        (-1, 0),
+        (0,  1),
+        (0, -1),
+    )
+
+    queenmoves = (
+        (1,   1),
+        (1,   0),
+        (1,  -1),
+        (0,   1),
+        (0,  -1),
+        (-1,  1),
+        (-1,  0),
+        (-1, -1),
+    )
+
     def pseudolegalmoves(self):
         moves = []
 
         # King moves
-        moves += self.closepiecemoves(self.kingsymbol(), [
-            (1,   1),
-            (1,   0),
-            (1,  -1),
-            (0,   1),
-            (0,  -1),
-            (-1,  1),
-            (-1,  0),
-            (-1, -1),
-        ])
+        moves += self.closepiecemoves("K" if self.whitesTurn else "k", self.kingmoves)
 
         # Knight moves
-        moves += self.closepiecemoves(self.knightsymbol(), [
-            (2,  -1),
-            (2,   1),
-            (1,  -2),
-            (1,   2),
-            (-1, -2),
-            (-1,  2),
-            (-2, -1),
-            (-2,  1),
-        ])
+        moves += self.closepiecemoves("N" if self.whitesTurn else "n", self.knightmoves)
 
         # Bishop moves
-        moves += self.rangedpiecemoves(self.bishopsymbol(), [
-            (1,   1),
-            (1,  -1),
-            (-1,  1),
-            (-1, -1),
-        ])
+        moves += self.rangedpiecemoves("B" if self.whitesTurn else "b", self.bishopmoves)
 
         # Rook moves
-        moves += self.rangedpiecemoves(self.rooksymbol(), [
-            (1,  0),
-            (-1, 0),
-            (0,  1),
-            (0, -1),
-        ])
+        moves += self.rangedpiecemoves("R" if self.whitesTurn else "r", self.rookmoves)
 
         # Queen moves
-        moves += self.rangedpiecemoves(self.queensymbol(), [
-            (1,   1),
-            (1,   0),
-            (1,  -1),
-            (0,   1),
-            (0,  -1),
-            (-1,  1),
-            (-1,  0),
-            (-1, -1),
-        ])
+        moves += self.rangedpiecemoves("Q" if self.whitesTurn else "q", self.queenmoves)
 
         for m in moves:
             m.whitesTurn = not m.whitesTurn
@@ -211,7 +209,9 @@ class Position:
             for j in range(8):
                 if self.board[i][j] in "kK":
                     kings += 1
-        return kings == 2
+                    if kings == 2:
+                        return True
+        return False
 
     def legalmoves(self):
         for j in range(8):
@@ -256,9 +256,9 @@ class Position:
                         score -= inf
                     else:
                         score -= (8-i)**1.9
-                if self.board[i][j].isupper():
+                if self.board[i][j] in self.whitePieces:
                     score += self.piecevalue(self.board[i][j])
-                if self.board[i][j].islower():
+                if self.board[i][j] in self.blackPieces:
                     score -= self.piecevalue(self.board[i][j])
 
         return score if self.whitesTurn else -score
