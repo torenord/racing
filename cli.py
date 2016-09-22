@@ -70,7 +70,9 @@ def handle(cmd):
             start = time.time()
             depth = int(cmd.split(" ")[1])
             global line
-            score, line = negamax(position, depth, -inf, inf)
+            result = negamax(position, depth, -inf, inf)
+            score = result["score"]
+            line = result["line"]
             position = line[0]
             score *= -1 if position.whitesTurn else 1
             print(position)
