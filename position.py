@@ -266,6 +266,18 @@ class Position:
     def __lt__(self, other):
         return self.evaluate() < other.evaluate()
 
+    def __eq__(self, other):
+        for i in range(8):
+            for j in range(8):
+                if self.board[i][j] != other.board[i][j]:
+                    return False
+        if self.whitesTurn != other.whitesTurn:
+            return False
+        return True
+
+    def __hash__(self):
+        return hash(repr(self))
+
 if __name__ == '__main__':
     from sys import stdin
 

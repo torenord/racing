@@ -1,8 +1,13 @@
 inf = 1000
 
+transpositions = {}
+
 def negamax(position, depth, a, b):
     if depth == 0:
         return position.evaluate(), []
+
+    if (position, depth) in transpositions:
+        return transpositions[(position, depth)]
 
     MAX = -inf
 
@@ -21,4 +26,5 @@ def negamax(position, depth, a, b):
         if a >= b:
             break
 
+    transpositions[(position, depth)] = MAX, bestline
     return MAX, bestline
