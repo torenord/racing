@@ -75,9 +75,6 @@ class Position:
 
         return self
 
-    def validcell(self, i, j):
-        return 0 <= i and i < 8 and 0 <= j and j < 8
-
     def emptycell(self, i, j):
         return self.board[i][j] == " "
 
@@ -103,8 +100,8 @@ class Position:
             for j in range(8):
                 if self.board[i][j] == symbol:
                     for di, dy in moves:
-                        if self.validcell(i+di, j+dy):
-                            if self.emptycell(i+di, j+dy) or self.opponentspiece(self.board[i+di][j+dy]):
+                        if 0 <= (i+di) and (i+di) < 8 and 0 <= (j+dy) and (j+dy) < 8:
+                            if self.board[i+di][j+dy] == " " or self.board[i+di][j+dy].islower() == self.whitesTurn:
                                 p = self.clone()
                                 p.movepiece(i, j, i+di, j+dy)
                                 ret.append(p)
@@ -119,13 +116,13 @@ class Position:
                 if self.board[i][j] == symbol:
                     for di, dy in directions:
                         for k in range(1, 8):
-                            if self.validcell(i+(k*di), j+(k*dy)):
-                                if self.emptycell(i+(k*di), j+(k*dy)):
+                            if 0 <= i+(k*di) and i+(k*di) < 8 and 0 <= j+(k*dy) and j+(k*dy) < 8:
+                                if self.board[i+(k*di)][j+(k*dy)] == " ":
                                     p = self.clone()
                                     p.movepiece(i, j, i+(k*di), j+(k*dy))
                                     ret.append(p)
                                     continue
-                                if self.opponentspiece(self.board[i+(k*di)][j+(k*dy)]):
+                                if self.board[i+(k*di)][j+(k*dy)].islower() == self.whitesTurn:
                                     p = self.clone()
                                     p.movepiece(i, j, i+(k*di), j+(k*dy))
                                     ret.append(p)
@@ -229,17 +226,19 @@ class Position:
                 ret.append(p)
         return ret
 
-    def piecevalue(self, piece):
-        scale = 1
-        D = {
-            "k": 0*scale,
-            "q": 7*scale,
-            "r": 5*scale,
-            "b": 4*scale,
-            "n": 1*scale,
-        }
-
-        return D[piece.lower()]
+    scale = 1
+    piecevalue = {
+        "k": 0*scale,
+        "q": 7*scale,
+        "r": 5*scale,
+        "b": 4*scale,
+        "n": 1*scale,
+        "K": 0*scale,
+        "Q": 7*scale,
+        "R": 5*scale,
+        "B": 4*scale,
+        "N": 1*scale,
+    }
 
     def evaluate(self):
         score = 0
@@ -257,9 +256,9 @@ class Position:
                     else:
                         score -= (8-i)**1.9
                 if self.board[i][j] in self.whitePieces:
-                    score += self.piecevalue(self.board[i][j])
+                    score += self.piecevalue[self.board[i][j]]
                 if self.board[i][j] in self.blackPieces:
-                    score -= self.piecevalue(self.board[i][j])
+                    score -= self.piecevalue[self.board[i][j]]
 
         return score if self.whitesTurn else -score
 
@@ -276,7 +275,7 @@ class Position:
         return True
 
     def __hash__(self):
-        return hash(repr(self))
+        return hash(tuple(tuple(row) for row in self.board)) ^ hash(self.whitesTurn)
 
 if __name__ == '__main__':
     from sys import stdin
