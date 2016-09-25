@@ -20,6 +20,7 @@ def decode(s):
 
 def handle(cmd):
     global position
+    global line
 
     # Quit
     if cmd == "q":
@@ -64,7 +65,7 @@ def handle(cmd):
         for p in position.legalmoves():
             print(p)
 
-    # Compute and apply next positions
+    # Compute to depth and apply next positions
     elif cmd.split(" ")[0] == "c":
         try:
             start = time.time()
@@ -77,6 +78,27 @@ def handle(cmd):
             score *= -1 if position.whitesTurn else 1
             print(position)
             print("Evaluation: ", score)
+            end = time.time()
+            print("Completed in {0:.3} seconds.".format(end - start))
+        except (IndexError, ValueError):
+            pass
+
+    # Compute in time and apply next positions
+    elif cmd.split(" ")[0] == "t":
+        try:
+            start = time.time()
+            t = float(cmd.split(" ")[1])
+            depth = 0
+            while depth == 0 or time.time() - start < t:
+                depth += 1
+                result = negamax(position, depth, -inf, inf)
+            score = result["score"]
+            line = result["line"]
+            position = line[0]
+            score *= -1 if position.whitesTurn else 1
+            print(position)
+            print("Depth:", depth)
+            print("Evaluation :", score)
             end = time.time()
             print("Completed in {0:.3} seconds.".format(end - start))
         except (IndexError, ValueError):
