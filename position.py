@@ -211,19 +211,23 @@ class Position:
         return False
 
     def legalmoves(self):
+        # No legal moves if one of the kings are on the 8th rank
         for j in range(8):
             if self.board[0][j] in "kK":
                 return []
 
         ret = []
         for p in self.pseudolegalmoves():
-            good = True
-            good &= all(q.hasking() for q in p.pseudolegalmoves())
+            # Check if I can check the opponent
+            if not all(q.hasking() for q in p.pseudolegalmoves()):
+                continue
+
+            # Check if I can check the opponent
             p.whitesTurn = not p.whitesTurn
-            good &= all(q.hasking() for q in p.pseudolegalmoves())
-            p.whitesTurn = not p.whitesTurn
-            if good:
+            if all(q.hasking() for q in p.pseudolegalmoves()):
+                p.whitesTurn = not p.whitesTurn
                 ret.append(p)
+
         return ret
 
     scale = 1
