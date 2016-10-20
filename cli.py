@@ -32,11 +32,12 @@ def handle(cmd):
         print("h -- Help")
         print("p -- Print current position")
         print("l -- Load position from file")
-        print("s -- Save position from file")
+        print("s -- Save position to file")
         print("n -- Print legal next positions")
-        print("c -- Compute and apply next positions")
+        print("c -- Compute to depth and apply best")
+        print("t -- Compute in time and apply best")
         print("m -- Move a piece")
-        print("v -- Show last principles variation")
+        print("v -- Show last principle variation")
 
     # Print current position
     elif cmd == "p":
@@ -77,7 +78,7 @@ def handle(cmd):
             position = line[0]
             score *= -1 if position.whitesTurn else 1
             print(position)
-            print("Evaluation: ", score)
+            print("Evaluation: {0:.3}".format(score))
             end = time.time()
             print("Completed in {0:.3} seconds.".format(end - start))
         except (IndexError, ValueError):
@@ -98,7 +99,7 @@ def handle(cmd):
             score *= -1 if position.whitesTurn else 1
             print(position)
             print("Depth:", depth)
-            print("Evaluation :", score)
+            print("Evaluation: {0:.3}".format(score))
             end = time.time()
             print("Completed in {0:.3} seconds.".format(end - start))
         except (IndexError, ValueError):
